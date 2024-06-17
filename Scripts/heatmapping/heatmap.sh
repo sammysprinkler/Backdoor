@@ -1,10 +1,30 @@
 #!/bin/bash
-# Heatmap - Visualizing web application usage
+# Heatmap - Generate a heatmap from a list of IP addresses
 # Options:
-# -u : URL of the target web application
-# -o : Output file
+# <file> : File containing a list of IP addresses
 
-# Usage: heatmap -u <target_url> -o <output_file>
-
+# Usage: heatmap <file>
 # Example script
-heatmap -u http://example.com -o heatmap_output.html
+# heatmap ip_addresses.txt
+
+# Check if required tool is installed
+if ! command -v heatmap_tool &> /dev/null
+then
+    echo "heatmap_tool could not be found, please install it first."
+    exit
+fi
+
+# Ensure file is provided
+if [ -z "$1" ]; then
+    echo "Usage: $0 <file>"
+    exit 1
+fi
+
+FILE=$1
+
+echo "Generating heatmap from $FILE"
+
+# Generate heatmap
+heatmap_tool -i $FILE -o heatmap_output.png
+
+echo "Heatmap generated: heatmap_output.png"
