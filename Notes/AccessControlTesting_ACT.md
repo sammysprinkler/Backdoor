@@ -1,7 +1,3 @@
-Sure, here is the Access Control Testing (ACT) section formatted similarly:
-
----
-
 # Access Control Testing (ACT) - Part 1
 
 ## 1. Test for User Enumeration
@@ -188,6 +184,3 @@ Sure, here is the Access Control Testing (ACT) section formatted similarly:
 - **Outside the Box**:
   - Check if access control is enforced on both client-side and server-side.
 
----
-
-Feel free to copy and paste this text into your GitHub repository or any Markdown editor! If you need any further adjustments or additional content, let me know
