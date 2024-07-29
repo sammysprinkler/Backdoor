@@ -1,0 +1,4 @@
+whois netflix.com > reconnaissance/whois_netflix.txt
+theHarvester -d netflix.com -b all -f reconnaissance/theharvester_netflix.html
+sublist3r -d netflix.com -o reconnaissance/sublist3r_netflix.txt
+nmap -p- -T4 -A -oN reconnaissance/nmap_netflix.txt netflix.com
