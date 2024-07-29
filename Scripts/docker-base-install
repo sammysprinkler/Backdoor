@@ -3,12 +3,14 @@ FROM ubuntu:latest
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive
+ENV PATH=$PATH:/usr/local/go/bin:/opt/metasploit-framework/bin:/root/go/bin
 
-# Update package lists and install necessary packages
+# Update package lists and install essential packages
 RUN apt-get update && apt-get install -y \
     sudo \
     python3 \
     python3-pip \
+    python3-venv \
     git \
     curl \
     wget \
@@ -20,7 +22,6 @@ RUN apt-get update && apt-get install -y \
     libbz2-dev \
     libreadline-dev \
     libsqlite3-dev \
-    wget \
     llvm \
     libncurses5-dev \
     xz-utils \
@@ -29,40 +30,69 @@ RUN apt-get update && apt-get install -y \
     libxmlsec1-dev \
     libffi-dev \
     liblzma-dev \
+    net-tools \
+    iputils-ping \
+    tcpdump \
+    jq \
+    tmux \
+    gnupg \
+    tor \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Amass
-RUN wget https://github.com/OWASP/Amass/releases/download/v3.13.1/amass_linux_amd64.zip && \
-    unzip amass_linux_amd64.zip && \
-    mv amass_linux_amd64/amass /usr/local/bin/ && \
-    rm -rf amass_linux_amd64* 
+# Install Metasploit using the alternative method
+RUN curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall && \
+    chmod 755 msfinstall && \
+    ./msfinstall
 
-# Install Metasploit
-RUN curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/apt/ubuntu/metasploit-framework.list | tee /etc/apt/sources.list.d/metasploit-framework.list && \
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3F3F7766 && \
-    apt-get update && \
-    apt-get install -y metasploit-framework && \
-    rm -rf /var/lib/apt/lists/*
+# Create a new user with sudo privileges
+RUN useradd -m -s /bin/bash pentester && \
+    echo 'pentester:pentester' | chpasswd && \
+    usermod -aG sudo pentester
 
-# Install Sublist3r
-RUN pip3 install sublist3r
+# Switch to the new user
+USER pentester
+WORKDIR /home/pentester
 
-# Install TheHarvester
-RUN git clone https://github.com/laramies/theHarvester.git /opt/theHarvester
-WORKDIR /opt/theHarvester
-RUN pip3 install -r requirements.txt
+# Set up Metasploit environment
+RUN msfdb init
 
-# Install sqlmap
-RUN apt-get install -y sqlmap
+# Switch back to root user for further installations
+USER root
 
-# Install OWASP ZAP
-RUN wget https://github.com/zaproxy/zaproxy/releases/download/v2.11.1/ZAP_2_11_1_unix.sh -O /opt/ZAP_2_11_1_unix.sh && \
-    chmod +x /opt/ZAP_2_11_1_unix.sh && \
-    /opt/ZAP_2_11_1_unix.sh -q
+# Install Python packages in a virtual environment
+RUN python3 -m venv /opt/venv && \
+    /opt/venv/bin/pip install --no-cache-dir \
+    requests \
+    bs4 \
+    lxml \
+    beautifulsoup4 \
+    scapy \
+    pwntools \
+    impacket
 
-# Copy additional scripts or configuration files
-COPY setup.sh /opt/setup.sh
-RUN chmod +x /opt/setup.sh
+# Install Go for additional tools
+RUN wget https://go.dev/dl/go1.21.5.linux-amd64.tar.gz && \
+    tar -C /usr/local -xzf go1.21.5.linux-amd64.tar.gz && \
+    rm go1.21.5.linux-amd64.tar.gz
 
-# Run the setup script
-ENTRYPOINT ["/opt/setup.sh"]
+# Clone and install Pentester Framework
+RUN git clone https://github.com/trustedsec/ptf /opt/ptf && \
+    cd /opt/ptf && \
+    ./ptf --update-all
+
+# Install Tor and configure it
+RUN apt-get update && apt-get install -y tor torsocks tor-geoipdb
+
+# Configure environment for anonymity
+RUN echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config
+
+# Add a final check to ensure critical components are installed
+RUN if ! command -v msfconsole > /dev/null; then \
+        echo "Metasploit is missing. Installation may have failed."; \
+    fi && \
+    if ! command -v go > /dev/null; then \
+        echo "Go is missing. Installation may have failed."; \
+    fi
+
+# Entrypoint for the container
+ENTRYPOINT ["/bin/bash"]
