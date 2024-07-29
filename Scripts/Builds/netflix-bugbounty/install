@@ -1,0 +1,6 @@
+sudo apt update
+sudo apt install burpsuite zaproxy nmap sublist3r python3-pip
+pip3 install requests
+git clone https://github.com/laramies/theHarvester.git
+cd theHarvester
+pip3 install -r requirements.txt
