@@ -1,0 +1,68 @@
+# Use a lightweight base image
+FROM ubuntu:latest
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Update package lists and install necessary packages
+RUN apt-get update && apt-get install -y \
+    sudo \
+    python3 \
+    python3-pip \
+    git \
+    curl \
+    wget \
+    nmap \
+    dnsutils \
+    build-essential \
+    libssl-dev \
+    zlib1g-dev \
+    libbz2-dev \
+    libreadline-dev \
+    libsqlite3-dev \
+    wget \
+    llvm \
+    libncurses5-dev \
+    xz-utils \
+    tk-dev \
+    libxml2-dev \
+    libxmlsec1-dev \
+    libffi-dev \
+    liblzma-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Amass
+RUN wget https://github.com/OWASP/Amass/releases/download/v3.13.1/amass_linux_amd64.zip && \
+    unzip amass_linux_amd64.zip && \
+    mv amass_linux_amd64/amass /usr/local/bin/ && \
+    rm -rf amass_linux_amd64* 
+
+# Install Metasploit
+RUN curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/apt/ubuntu/metasploit-framework.list | tee /etc/apt/sources.list.d/metasploit-framework.list && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3F3F7766 && \
+    apt-get update && \
+    apt-get install -y metasploit-framework && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Sublist3r
+RUN pip3 install sublist3r
+
+# Install TheHarvester
+RUN git clone https://github.com/laramies/theHarvester.git /opt/theHarvester
+WORKDIR /opt/theHarvester
+RUN pip3 install -r requirements.txt
+
+# Install sqlmap
+RUN apt-get install -y sqlmap
+
+# Install OWASP ZAP
+RUN wget https://github.com/zaproxy/zaproxy/releases/download/v2.11.1/ZAP_2_11_1_unix.sh -O /opt/ZAP_2_11_1_unix.sh && \
+    chmod +x /opt/ZAP_2_11_1_unix.sh && \
+    /opt/ZAP_2_11_1_unix.sh -q
+
+# Copy additional scripts or configuration files
+COPY setup.sh /opt/setup.sh
+RUN chmod +x /opt/setup.sh
+
+# Run the setup script
+ENTRYPOINT ["/opt/setup.sh"]
