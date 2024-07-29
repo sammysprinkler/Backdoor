@@ -1,1 +1,4 @@
-sudo docker exec -it -u pentester pentest_20240729_151443 /bin/bash
+sudo docker exec -it -u pentester *yournamehere* /bin/bash
+
+sudo docker start *yournamehere*
+
